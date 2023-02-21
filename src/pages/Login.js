@@ -1,5 +1,18 @@
+import { login } from "../api/login";
 import FormularioLogin from "../components/FormularioLogin";
-import { Form } from "react-router-dom";
+import { Form, redirect } from "react-router-dom";
+
+export async function action({ request }) {
+  const formData = await request.formData();
+  const datos = Object.fromEntries(formData);
+  await login(datos);
+  console.log(datos)
+  if (sessionStorage.getItem("token") === null) {
+    <p> Error </p>;
+  } else {
+    return redirect("/index");
+  }
+}
 
 function Login() {
   return (
@@ -7,9 +20,9 @@ function Login() {
       <Form method="post">
         <FormularioLogin />
 
-        <div class="text-center py-3">
+        <div className="button-login text-center py-3">
           <input
-            class="btn btn-secondary my-2 "
+            className=" btn btn-secondary my-2 "
             type="submit"
             value="Ingresar"
           />

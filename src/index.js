@@ -3,10 +3,10 @@ import ReactDOM from 'react-dom/client'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import Layout from './components/Layout'
-import Login from './pages/Login'
+import Login, {action as actionLogin} from './pages/Login'
 import Index from './pages/Home'
 import MostrarDatosDocente from './components/MostrarDatosDocente'
-import NuevaActividadDevengamiento from './pages/NuevaActividadDevengamiento'
+import NuevaActividadDevengamiento, {action as actionActividadDevengamiento} from './pages/NuevaActividadDevengamiento'
 import MostrarActividades from "./components/MostrarActividades"
 
 const router = createBrowserRouter([
@@ -18,6 +18,7 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <Login />,
+        action: actionLogin
       },
     {
       path:"/index",
@@ -29,7 +30,10 @@ const router = createBrowserRouter([
     },
     {
       path: "/nuevaActividad",
-      element : <NuevaActividadDevengamiento/>
+      element : <NuevaActividadDevengamiento/>,
+      action: actionActividadDevengamiento
+      
+
     },
     {
       path: "/MostrarActividades",

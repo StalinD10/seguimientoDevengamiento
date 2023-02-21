@@ -3,6 +3,9 @@ import { Modal } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import Navigation from "./Navigation";
 
+const token = sessionStorage.getItem("token");
+
+
 function FormularioNuevaActividad() {
   const [estadoModal1, cambiarEstadoModal1] = useState(false);
   const [estadoModal2, cambiarEstadoModal2] = useState(false);
@@ -46,6 +49,23 @@ function FormularioNuevaActividad() {
   function handleChange4(event) {
     setValorEnlaceVerificacion(event.target.value);
   }
+
+  let idFacultad = valorSelectFacultad;
+    localStorage.setItem("idFacultad", idFacultad);
+
+
+    const datoSeleccionado = valorSelectModal;
+    localStorage.setItem("datoSeleccionado", datoSeleccionado);
+
+    const idCarreraSeleccionada = valorSelectCarrera;
+    localStorage.setItem("idCarrera", idCarreraSeleccionada);
+
+    const nombreOtraInstitucion = valorOtraInstitucion;
+    localStorage.setItem("nombreOtraInstitucion", nombreOtraInstitucion);
+
+    const detalleDocente = valorDetalleActividadDocente;
+    localStorage.setItem("detalleDocente", detalleDocente);
+    
 
   function cambiarModal() {
     const valueSelect = document.getElementById("select").value;
@@ -500,7 +520,7 @@ function FormularioNuevaActividad() {
               keyboard={false}
             >
               <Modal.Header closeButton>
-                <Modal.Title> Actividad Innovacion</Modal.Title>
+                <Modal.Title> Otra Institución</Modal.Title>
               </Modal.Header>
               <Modal.Body>
                 <div className="form-group  d-flex flex-column justify-content-center align-items-center py-2">
