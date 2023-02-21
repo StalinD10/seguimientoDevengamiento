@@ -6,6 +6,9 @@ import Layout from './components/Layout'
 import Login from './pages/Login'
 import Index from './pages/Home'
 import MostrarDatosDocente from './components/MostrarDatosDocente'
+import NuevaActividadDevengamiento from './pages/NuevaActividadDevengamiento'
+import MostrarActividades from "./components/MostrarActividades"
+
 const router = createBrowserRouter([
  
   {
@@ -23,8 +26,17 @@ const router = createBrowserRouter([
     {
       path: "/datosDocente",
       element : <MostrarDatosDocente/>
+    },
+    {
+      path: "/nuevaActividad",
+      element : <NuevaActividadDevengamiento/>
+    },
+    {
+      path: "/MostrarActividades",
+      element : <MostrarActividades/>
     }
-      
+
+          
     ]
 
   },
