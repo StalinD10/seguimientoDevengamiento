@@ -33,7 +33,7 @@ function Navigation() {
                 keyboard={false}
               >
                 <Modal.Header closeButton>
-                  <Modal.Title>Solicitud de Devengamiento</Modal.Title>
+                  <Modal.Title>Solicitud de acta de finiquito</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                   <p>

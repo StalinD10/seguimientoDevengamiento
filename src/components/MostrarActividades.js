@@ -555,7 +555,7 @@ function MostrarActividades() {
                               className="p-2 col-form-label"
                               htmlFor="nombreOtraInstitucion"
                             >
-                              Nombre de la otra Institución
+                              Nombre de la Institución
                             </label>
                             <div className="p-2 col-sm-6">
                               <input

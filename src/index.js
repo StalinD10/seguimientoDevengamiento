@@ -8,7 +8,7 @@ import Index from './pages/Home'
 import MostrarDatosDocente from './components/MostrarDatosDocente'
 import NuevaActividadDevengamiento, {action as actionActividadDevengamiento} from './pages/NuevaActividadDevengamiento'
 import MostrarActividades from "./components/MostrarActividades"
-
+import ErrorPage from './components/ErrorPage'
 const router = createBrowserRouter([
  
   {
@@ -18,7 +18,8 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <Login />,
-        action: actionLogin
+        action: actionLogin,
+        errorElement: <ErrorPage/>
       },
     {
       path:"/index",
@@ -26,13 +27,14 @@ const router = createBrowserRouter([
     },
     {
       path: "/datosDocente",
-      element : <MostrarDatosDocente/>
+      element : <MostrarDatosDocente/>,
+      errorElement: <ErrorPage/>
     },
     {
       path: "/nuevaActividad",
       element : <NuevaActividadDevengamiento/>,
-      action: actionActividadDevengamiento
-      
+      action: actionActividadDevengamiento,
+      errorElement: <ErrorPage/>
 
     },
     {

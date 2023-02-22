@@ -92,10 +92,10 @@ function NuevaActividadDevengamiento() {
   return (
     <div>
       <Form method="post">
+       
+        <FormularioNuevaActividad />
         {errores?.length &&
           errores.map((error, i) => <Error key={i}>{error} </Error>)}
-        <FormularioNuevaActividad />
-
         <div className="text-center py-3">
           <input
             className="btn btn-secondary my-2 "

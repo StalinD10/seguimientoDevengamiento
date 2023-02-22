@@ -1,10 +1,12 @@
+
+
 function FormularioLogin() {
  
   return (
     <div>
       <div className="container py-5  text-center ">
         <div className="card-header py-5">
-          <h3>Iniciar Sesion</h3>
+          <h3>Iniciar Sesión</h3>
         </div>
         <div className="card-body">
           <div>
