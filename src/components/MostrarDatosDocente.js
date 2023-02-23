@@ -4,7 +4,7 @@ import Navigation from "./Navigation";
 import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 import { useEffect, useState } from "react";
-import NuevaActividadDevengamiento from "../pages/NuevaActividadDevengamiento";
+import Swal from "sweetalert2";
 
 const idPersona = sessionStorage.getItem("idPersona");
 const token = sessionStorage.getItem("token");
@@ -13,138 +13,278 @@ const variableDatosDocente =
   process.env.REACT_APP_API_GENERAL + "/docent/byIdPerson";
 const variableDatosDevengamiento =
   process.env.REACT_APP_API_GENERAL + "/accrualData/ByIdPerson";
+const variableActualizarDevengamiento =
+  process.env.REACT_APP_API_GENERAL + "/accrualData";
 const variableRedes = process.env.REACT_APP_API_GENERAL + "/network/byIdPerson";
-
-const useLoaderData = () => {
-  const [data, setData] = useState({});
-  const loader = async () => {
-    try {
-      const response1 = await fetch(`${variable}/${idPersona}`, {
-        method: "GET",
-        mode: "cors",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data1 = await response1.json();
-
-      setData([{ ...data1 }]);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  useEffect(() => {
-    loader();
-  }, []);
-
-  return data;
-};
-const useLoaderData2 = () => {
-  const [data2, setData2] = useState({});
-  const loader2 = async () => {
-    try {
-      const response2 = await fetch(`${variableDatosDocente}/${idPersona}`, {
-        method: "GET",
-        mode: "cors",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const dataDocente = await response2.json();
-
-      setData2([{ ...dataDocente }]);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  useEffect(() => {
-    loader2();
-  }, []);
-  return data2;
-};
-
-const useLoaderData3 = () => {
-  const [data3, setData3] = useState({});
-  const loader3 = async () => {
-    try {
-      const response3 = await fetch(
-        `${variableDatosDevengamiento}/${idPersona}`,
-        {
+const variableActualizarRedes = process.env.REACT_APP_API_GENERAL + "/network";
+const variableObservaciones =  process.env.REACT_APP_API_GENERAL+"/accrualData/observation"
+function MostrarDatosDocente() {
+  const [idAccrualData, setIdAccrualData] = useState("");
+  const [idNetwork, setIdNetwork] = useState("");
+  const [docente, setDocente] = useState({});
+  const [observaciones, setObservaciones] = useState("");
+  const useLoaderData = () => {
+    const [data, setData] = useState({});
+    const loader = async () => {
+      try {
+        const response1 = await fetch(`${variable}/${idPersona}`, {
           method: "GET",
           mode: "cors",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
+        });
+
+        const data1 = await response1.json();
+
+        setData([{ ...data1 }]);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    useEffect(() => {
+      loader();
+    }, []);
+
+    return data;
+  };
+  const useLoaderData2 = () => {
+    const [data2, setData2] = useState({});
+    const loader2 = async () => {
+      try {
+        const response2 = await fetch(`${variableDatosDocente}/${idPersona}`, {
+          method: "GET",
+          mode: "cors",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const dataDocente = await response2.json();
+
+        setData2([{ ...dataDocente }]);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    useEffect(() => {
+      loader2();
+    }, []);
+    return data2;
+  };
+
+  const useLoaderData3 = () => {
+    const [data3, setData3] = useState({});
+    const loader3 = async () => {
+      try {
+        const response3 = await fetch(
+          `${variableDatosDevengamiento}/${idPersona}`,
+          {
+            method: "GET",
+            mode: "cors",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const dataDevengamiento = await response3.json();
+
+        const idAccrualDataObtenido = dataDevengamiento.idAccrualData;
+        setIdAccrualData(dataDevengamiento.idAccrualData);
+        setDocente(dataDevengamiento.docent);
+
+        //Set a las variables de editar Datos Devengamiento
+        setEnlaceTesis(dataDevengamiento.thesisLink);
+        setFechaLectura(dataDevengamiento.fechaLecturaTesis);
+        setFechaReintegro(dataDevengamiento.fechaReintegroTesis);
+        setTiempoDevengamiento(dataDevengamiento.accrualTime);
+        setEnlaceAdendaContrato(dataDevengamiento.contractAddendumLink);
+
+        const fechaLecturaTesisAnio = dataDevengamiento.readingThesisDate[0];
+        const fechaLecturaTesisMes = dataDevengamiento.readingThesisDate[1];
+        const fechaLecturaTesisDia = dataDevengamiento.readingThesisDate[2];
+        const fechaLecturaTesis =
+          fechaLecturaTesisDia +
+          "/" +
+          fechaLecturaTesisMes +
+          "/" +
+          fechaLecturaTesisAnio;
+
+        const fechaReintegroTesisAnio = dataDevengamiento.refundDate[0];
+        const fechaReintegroTesisMes = dataDevengamiento.refundDate[1];
+        const fechaReintegroTesisDia = dataDevengamiento.refundDate[2];
+        const fechaReintegroTesis =
+          fechaReintegroTesisAnio +
+          "/" +
+          fechaReintegroTesisMes +
+          "/" +
+          fechaReintegroTesisDia;
+
+        setData3([
+          { ...dataDevengamiento, fechaLecturaTesis, fechaReintegroTesis },
+        ]);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    useEffect(() => {
+      loader3();
+    }, []);
+
+    return data3;
+  };
+
+  const useLoaderData4 = () => {
+    const [data4, setData4] = useState({});
+    const loader4 = async () => {
+      try {
+        const response4 = await fetch(`${variableRedes}/${idPersona}`, {
+          method: "GET",
+          mode: "cors",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const dataRedes = await response4.json();
+        const idNetwork = dataRedes.idNetworks;
+        setIdNetwork(dataRedes.idNetworks);
+
+
+        //Set a las variables de editar Redes
+        setRediCedia(dataRedes.cedia);
+        setSenescyt(dataRedes.rniSenesyt);
+        setOrcid(dataRedes.orcidCode);
+        
+        
+        setData4([{ ...dataRedes }]);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    useEffect(() => {
+      loader4();
+    }, []);
+
+    return data4;
+  };
+
+  async function handleSubmit() {
+    try {
+      const respuestaActualizar = await fetch(
+        `${variableActualizarDevengamiento}/${idAccrualData}`,
+        {
+          method: "PUT",
+          mode: "cors",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            thesisLink: enlaceTesis,
+            readingThesisDate: fechaLectura,
+            refundDate: fechaReintegro,
+            contractAddendumLink: enlaceAdendaContrato,
+            settlement: "false",
+            observations: "null",
+            accrualTime: tiempoDevengamiento,
+            docent: docente,
+          }),
         }
       );
-
-      const dataDevengamiento = await response3.json();
-      const fechaLecturaTesisAnio = dataDevengamiento.readingThesisDate[0];
-      const fechaLecturaTesisMes = dataDevengamiento.readingThesisDate[1];
-      const fechaLecturaTesisDia = dataDevengamiento.readingThesisDate[2];
-      const fechaLecturaTesis =
-        fechaLecturaTesisAnio +
-        "-" +
-        fechaLecturaTesisMes +
-        "-" +
-        fechaLecturaTesisDia;
-
-      const fechaReintegroTesisAnio = dataDevengamiento.refundDate[0];
-      const fechaReintegroTesisMes = dataDevengamiento.refundDate[1];
-      const fechaReintegroTesisDia = dataDevengamiento.refundDate[2];
-      const fechaReintegroTesis =
-        fechaReintegroTesisAnio +
-        "-" +
-        fechaReintegroTesisMes +
-        "-" +
-        fechaReintegroTesisDia;
-
-      setData3([
-        { ...dataDevengamiento, fechaLecturaTesis, fechaReintegroTesis },
-      ]);
+      await respuestaActualizar.json();
+      if (respuestaActualizar.ok) {
+        window.location.reload();
+      }
     } catch (error) {
       console.log(error);
     }
-  };
-  useEffect(() => {
-    loader3();
-  }, []);
-  return data3;
-};
+  }
 
-const useLoaderData4 = () => {
-  const [data4, setData4] = useState({});
-  const loader4 = async () => {
+
+  async function handleSubmitObservaciones() {
     try {
-      const response4 = await fetch(`${variableRedes}/${idPersona}`, {
-        method: "GET",
-        mode: "cors",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+      const respuestaActualizar = await fetch(
+        `${variableObservaciones}/${idAccrualData}`,
+        {
+          method: "PATCH",
+          mode: "cors",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(
+            observaciones),
+        }
+      );
+      await respuestaActualizar.json();
+      if (respuestaActualizar.ok) {
+      
+        await Swal.fire({
+          title: "Enviado",
+          text: "La observación ha sido enviada correctamente",
+          icon: "success",
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "OK",
+        });
+        handleClose();
+      } else {
+        await Swal.fire({
+          title: "Error",
+          text: "Ocurrió un error al enviar la observación",
+          icon: "error",
+          confirmButtonColor: "#3085d6",
+          confirmButtonText: "OK",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      await Swal.fire({
+        title: "Error",
+        text: "Ocurrió un error al enviar la observación",
+        icon: "error",
+        confirmButtonColor: "#3085d6",
+        confirmButtonText: "OK",
       });
+    }
+  }
 
-      const dataRedes = await response4.json();
-
-      setData4([{ ...dataRedes }]);
+  async function handleSubmitRedes() {
+    try {
+      const respuestaActualizar = await fetch(
+        `${variableActualizarRedes}/${idNetwork}`,
+        {
+          method: "PUT",
+          mode: "cors",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            cedia: rediCedia,
+            docent: docente,
+            orcidCode: orcid,
+            rniSenesyt: senescyt,
+            socialNetworks: [],
+          }),
+        }
+      );
+      await respuestaActualizar.json();
+      if (respuestaActualizar.ok) {
+        window.location.reload();
+      }
     } catch (error) {
       console.log(error);
     }
-  };
-  useEffect(() => {
-    loader4();
-  }, []);
+  }
 
-  return data4;
-};
-
-function MostrarDatosDocente() {
+  
   const datos = useLoaderData();
   const datosDocente = useLoaderData2();
   const datosDevengamiento = useLoaderData3();
@@ -169,6 +309,11 @@ function MostrarDatosDocente() {
   const [tiempoDevengamiento, setTiempoDevengamiento] = useState("");
   const [enlaceAdendaContrato, setEnlaceAdendaContrato] = useState("");
 
+  //Obtener datos redes
+  const [rediCedia, setRediCedia] = useState("");
+  const [senescyt, setSenescyt] = useState("");
+  const [orcid, setOrcid] = useState("");
+
   function handleChangeEnlaceTesis(event) {
     setEnlaceTesis(event.target.value);
   }
@@ -186,6 +331,21 @@ function MostrarDatosDocente() {
 
   function handleChangeEnlaceAdendaContrato(event) {
     setEnlaceAdendaContrato(event.target.value);
+  }
+  function handleChangeRediCedia(event) {
+    setRediCedia(event.target.value);
+  }
+
+  function handleChangeSenescyt(event) {
+    setSenescyt(event.target.value);
+  }
+
+  function handleChangeRediOrcid(event) {
+    setOrcid(event.target.value);
+  }
+
+  function handleChangeObservaciones(event) {
+    setObservaciones(event.target.value);
   }
 
   return (
@@ -434,7 +594,7 @@ function MostrarDatosDocente() {
                         >
                           Cancelar
                         </Button>
-                        <Button variant="primary" onClick={handleCloseEditDev}>
+                        <Button variant="primary" onClick={handleSubmit}>
                           Enviar
                         </Button>
                       </Modal.Footer>
@@ -463,124 +623,126 @@ function MostrarDatosDocente() {
             <tbody>
               {datosRedes.map((redes, index) => (
                 <tr key={index}>
-                   <td>
-                    {redes.cedia === null
-                      ? "No disponible"
-                      : redes.cedia}
-                  </td>   
+                  <td>
+                    {redes.cedia === null ? "No disponible" : redes.cedia}
+                  </td>
                   <td>
                     {redes.rniSenesyt === null
                       ? "No disponible"
-                      : redes.rniSenesyt
-                    }
-                  </td>   
+                      : redes.rniSenesyt}
+                  </td>
                   <td>
                     {redes.orcidCode === null
                       ? "No disponible"
-                      : redes.orcidCode
-                    }
-                  </td>   
-              <td>
-                <Button variant="primary" onClick={handleShowEditRed}>
-                  Editar
-                </Button>
-                <Modal show={showEditRed} onHide={handleCloseEditRed}>
-                  <Modal.Header closeButton>
-                    <Modal.Title>Datos de Redes </Modal.Title>
-                  </Modal.Header>
-                  <Modal.Body>
-                    <div className="container py-3  text-center ">
-                      <div className="card-body">
-                        <div>
-                          <div className="form-group  d-flex flex-column justify-content-center align-items-center py-2">
-                            <label
-                              className="p-2 col-form-label"
-                              htmlFor="Senescyt"
-                            >
-                              Forma parte de la Red de Investigadores nacionales
-                              de REDI/ CEDIA{" "}
-                            </label>
-                            <div className="p-2 col-sm-8">
-                              <select
-                                id="select"
-                                className="form-control"
-                                required={true}
-                                name="idSenescyt"
-                              >
-                                <option>Seleccione... </option>
-                                <option value="1">SI</option>
-                                <option value="2">NO</option>
-                              </select>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div>
-                          <div className="form-group  d-flex flex-column justify-content-center align-items-center py-2">
-                            <label
-                              className="p-2 col-form-label"
-                              htmlFor="Senescyt"
-                            >
-                              Está registrado en el sistema de Investigadores
-                              nacionales de Senescyt
-                            </label>
-                            <div className="p-2 col-sm-8">
-                              <select
-                                id="select"
-                                className="form-control"
-                                required={true}
-                                name="idSenescyt"
-                              >
-                                <option>Seleccione... </option>
-                                <option value="1">SI</option>
-                                <option value="2">NO</option>
-                              </select>
-                            </div>
-                          </div>
-                        </div>
-                        <div>
-                          <div>
-                            <div className="form-group  d-flex flex-column justify-content-center align-items-center py-2">
-                              <label
-                                className="p-2 col-form-label"
-                                htmlFor="Senescyt"
-                              >
-                                Tiene código ORCID{" "}
-                              </label>
-                              <div className="p-2 col-sm-8">
-                                <select
-                                  id="select"
-                                  className="form-control"
-                                  required={true}
-                                  name="idSenescyt"
+                      : redes.orcidCode}
+                  </td>
+                  <td>
+                    <Button variant="primary" onClick={handleShowEditRed}>
+                      Editar
+                    </Button>
+                    <Modal show={showEditRed} onHide={handleCloseEditRed}>
+                      <Modal.Header closeButton>
+                        <Modal.Title>Datos de Redes </Modal.Title>
+                      </Modal.Header>
+                      <Modal.Body>
+                        <div className="container py-3  text-center ">
+                          <div className="card-body">
+                            <div>
+                              <div className="form-group  d-flex flex-column justify-content-center align-items-center py-2">
+                                <label
+                                  className="p-2 col-form-label"
+                                  htmlFor="Senescyt"
                                 >
-                                  <option>Seleccione... </option>
-                                  <option value="1">SI</option>
-                                  <option value="2">NO</option>
-                                </select>
+                                  Forma parte de la Red de Investigadores
+                                  nacionales de REDI/ CEDIA{" "}
+                                </label>
+                                <div className="p-2 col-sm-8">
+                                  <select
+                                    id="select"
+                                    className="form-control"
+                                    required={true}
+                                    name="idSenescyt"
+                                    value={rediCedia}
+                                    onChange={handleChangeRediCedia}
+                                  >
+                                    <option>Seleccione... </option>
+                                    <option value="Si">SI</option>
+                                    <option value="No">NO</option>
+                                  </select>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div>
+                              <div className="form-group  d-flex flex-column justify-content-center align-items-center py-2">
+                                <label
+                                  className="p-2 col-form-label"
+                                  htmlFor="Senescyt"
+                                >
+                                  Está registrado en el sistema de
+                                  Investigadores nacionales de Senescyt
+                                </label>
+                                <div className="p-2 col-sm-8">
+                                  <select
+                                    id="select"
+                                    className="form-control"
+                                    required={true}
+                                    name="idSenescyt"
+                                    value={senescyt}
+                                    onChange={handleChangeSenescyt}
+                                  >
+                                    <option>Seleccione... </option>
+                                    <option value="Si">SI</option>
+                                    <option value="No">NO</option>
+                                  </select>
+                                </div>
+                              </div>
+                            </div>
+                            <div>
+                              <div>
+                                <div className="form-group  d-flex flex-column justify-content-center align-items-center py-2">
+                                  <label
+                                    className="p-2 col-form-label"
+                                    htmlFor="Senescyt"
+                                  >
+                                    Codigo Orcid
+                                  </label>
+                                  <div className="p-2 col-sm-8">
+                                    <input
+                                      type="text"
+                                      id="select"
+                                      className="form-control"
+                                      required={true}
+                                      name="orcid"
+                                      value={orcid}
+                                      onChange={handleChangeRediOrcid}
+                                    />
+                                  </div>
+                                </div>
                               </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </div>
-                  </Modal.Body>
-                  <Modal.Footer>
-                    <Button variant="secondary" onClick={handleCloseEditRed}>
-                      Cancelar
-                    </Button>
-                    <Button variant="primary" onClick={handleCloseEditRed}>
-                      Enviar
-                    </Button>
-                  </Modal.Footer>
-                </Modal>
-              </td>
-            </tr>
-           ))}
-           </tbody>
-         ) : (
-           <p>No existen datos del docente disponibles</p>
-         )}
+                      </Modal.Body>
+                      <Modal.Footer>
+                        <Button
+                          variant="secondary"
+                          onClick={handleCloseEditRed}
+                        >
+                          Cancelar
+                        </Button>
+                        <Button variant="primary" onClick={handleSubmitRedes}>
+                          Enviar
+                        </Button>
+                      </Modal.Footer>
+                    </Modal>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          ) : (
+            <p>No existen datos del docente disponibles</p>
+          )}
         </Table>
       </div>
       <div className="py-2 text-center">
@@ -601,7 +763,7 @@ function MostrarDatosDocente() {
                   Comentar si existe alguna novedad con los datos para
                   modificarlos
                 </Form.Label>
-                <Form.Control as="textarea" rows={3} />
+                <textarea   value={observaciones} onChange={handleChangeObservaciones} className="form-control" maxLength={80}/>
               </Form.Group>
             </Form>
           </Modal.Body>
@@ -609,7 +771,7 @@ function MostrarDatosDocente() {
             <Button variant="secondary" onClick={handleClose}>
               Cancelar
             </Button>
-            <Button variant="primary" onClick={handleClose}>
+            <Button variant="primary" onClick={handleSubmitObservaciones}>
               Enviar
             </Button>
           </Modal.Footer>

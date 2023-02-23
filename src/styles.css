@@ -1,6 +1,5 @@
-
-h3{
-    color: #0076bd 
+h3 {
+    color: #0076bd
 }
 
 /*Header*/
@@ -9,7 +8,7 @@ h3{
     background-repeat: no-repeat;
     background-position: left;
     background-size: cover;
-    padding: 2rem;
+    padding: 2.5rem;
 }
 
 .footer {
@@ -22,10 +21,33 @@ h3{
     padding: 2rem;
 }
 
+@media (max-width: 375px) {
+    .header {
+        background-size: auto;
+
+        background-position: center center;
+        text-align: right;
+    }
+
+    h3 {
+        font-size: 1.5em;
+      
+    }
+  
+
+    .footer {
+        background-size: auto;
+        text-align: right;
+        background-position: center center;
+    }
+}
+
+
+
 .text {
     color: #0076bd;
 }
 
-.button-login{
+.button-login {
     margin-bottom: 8rem;
 }
