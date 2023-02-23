@@ -289,7 +289,7 @@ function MostrarDatosDocente() {
   const datosDocente = useLoaderData2();
   const datosDevengamiento = useLoaderData3();
   const datosRedes = useLoaderData4();
-
+  
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);

@@ -4,26 +4,44 @@ import Swal from "sweetalert2";
 import Error from "../components/Error";
 
 const token = sessionStorage.getItem("token");
+const variableSubmit = process.env.REACT_APP_API_GENERAL + "/activityPlanAccrual";
 
 export async function action({ request }) {
-  console.log(request);
   const storedData = localStorage.getItem("datoSeleccionado");
-
-  const idUniversidad = localStorage.getItem("idUniversidad");
+const idPersona = sessionStorage.getItem("idPersona");
+  const idUniversidad = 1;
+  const period = localStorage.getItem("periodo");
+  const institutionNameLocal =  localStorage.getItem("universidad")
   const idCarrera = localStorage.getItem("idCarrera");
   const nombreOtraInstitucion = localStorage.getItem("nombreOtraInstitucion");
   const idFacultad = localStorage.getItem("idFacultad");
   const detalleDocente = localStorage.getItem("detalleDocente");
   const idPlan = sessionStorage.getItem("idPlan");
+  const enlaceVerificacion = localStorage.getItem("enlaceVerificacion");
+  const idActividad = localStorage.getItem("idActividad")
+
   const formData = await request.formData();
   const datos = Object.fromEntries(formData);
-  datos.idSubTipoActividad = storedData;
-  datos.idUniversidad = idUniversidad;
-  datos.idCarrera = idCarrera;
-  datos.nombreOtraInstitucion = nombreOtraInstitucion;
-  datos.idFacultad = idFacultad;
-  datos.detalleDocente = detalleDocente;
-  datos.idPlan = idPlan;
+
+  datos.idActivitySubtype = storedData;
+  datos.period = period;
+  datos.idPerson= idPersona;
+
+  if (detalleDocente !== "") {
+    datos.descriptionSubtype = detalleDocente;
+  }
+
+  if (enlaceVerificacion == "" && nombreOtraInstitucion == "") {
+    datos.idCareer = idCarrera;
+    datos.idFaculty = idFacultad;
+    datos.idUniversity = idUniversidad;
+    datos.institutionName = institutionNameLocal;
+  }
+  if (idCarrera == "") {
+    datos.otherInstitutionName = nombreOtraInstitucion;
+    datos.verificationLink = enlaceVerificacion;
+  }
+
 
   //Validacion
   const errores = [];
@@ -37,17 +55,18 @@ export async function action({ request }) {
   }
 
   try {
-    const respuesta = await fetch(import.meta.env.VITE_API_AGREGAR_ACTIVIDAD, {
+    const respuesta = await fetch(variableSubmit, {
       method: "POST",
       mode: "cors",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(datos),
+      body: JSON.stringify(
+        datos),
     });
     const actividades = await respuesta.json();
-
+    sessionStorage.setItem("idPlan", actividades)
     if (respuesta.ok) {
       await Swal.fire({
         title: "Enviado",
@@ -56,11 +75,11 @@ export async function action({ request }) {
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
-        confirmButtonText: "OK",
-        cancelButtonText: "Enviar otra respuesta",
+        confirmButtonText: "Enviar otra Respuesta",
+        cancelButtonText: "Cerrar",
       }).then((result) => {
         if (result.isConfirmed) {
-          window.location.href = "/mostrarActividades";
+          window.location.href = "/nuevaActividad";
         } else if (result.dismiss === Swal.DismissReason.cancel) {
           setTimeout(function () {}, 1);
         }
@@ -68,7 +87,7 @@ export async function action({ request }) {
     } else {
       await Swal.fire({
         title: "Error",
-        text: "Ocurrió un error al enviar el formulario, debes llenar primero el PLAN DE DEVENGAMIENTO",
+        text: "Ocurrió un error al enviar el formulario",
         icon: "error",
         confirmButtonColor: "#3085d6",
         confirmButtonText: "OK",
@@ -92,7 +111,6 @@ function NuevaActividadDevengamiento() {
   return (
     <div>
       <Form method="post">
-       
         <FormularioNuevaActividad />
         {errores?.length &&
           errores.map((error, i) => <Error key={i}>{error} </Error>)}

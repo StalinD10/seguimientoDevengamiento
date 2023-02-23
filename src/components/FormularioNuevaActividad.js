@@ -4,9 +4,14 @@ import Button from "react-bootstrap/Button";
 import Navigation from "./Navigation";
 
 const token = sessionStorage.getItem("token");
+const variableTipoActividad = process.env.REACT_APP_API_GENERAL + "/type";
+const variableFacultad =
+  process.env.REACT_APP_API_GENERAL + "/faculty/byIdUniversity";
+const variableCarrera =
+  process.env.REACT_APP_API_GENERAL + "/career/byIdFaculty";
+const variableSubTipo = process.env.REACT_APP_API_GENERAL + "/subtype/byIdType";
 
-
-function FormularioNuevaActividad() {
+function FormularioNuevaActividad({}) {
   const [estadoModal1, cambiarEstadoModal1] = useState(false);
   const [estadoModal2, cambiarEstadoModal2] = useState(false);
   const [estadoModal3, cambiarEstadoModal3] = useState(false);
@@ -19,12 +24,11 @@ function FormularioNuevaActividad() {
   const [valorSelectCarrera, setvalorSelectCarrera] = useState("");
   const [data, setData] = useState([]);
   const [dataFacultades, setDataFacultades] = useState([]);
-  const [actividadID, setActividadID] = useState([]);
-  const [actividadDocente, setActividadDocente] = useState([]);
-  const [actividadInnovacion, setActividadInnovacion] = useState([]);
-  const [actividadInvestigadora, setActividadInvestigadora] = useState([]);
+
+  const [subActividades, setSubActividades] = useState([]);
   const [tipoActividad, setTipoActividad] = useState([]);
   const [selectedOption, setselectedOption] = useState("");
+  const [valorActividades, setValorActividades] = useState(1);
   const [valorOtraInstitucion, setvalorOtraInstitucion] = useState("");
   const [valorEnlaceVerificacion, setValorEnlaceVerificacion] = useState("");
   const [valorDetalleActividadDocente, setvalorDetalleActividadDocente] =
@@ -32,13 +36,11 @@ function FormularioNuevaActividad() {
 
   function handleChange(event) {
     setValorSelectModal(event.target.value);
-    setvalorSelectUniversidad(event.target.value);
-    setvalorSelectFacultad(event.target.value);
-    setvalorSelectCarrera(event.target.value);
+
     setselectedOption(event.target.value);
   }
+
   function handleChange2(event) {
-    setvalorDetalleActividadDocente(event.target.value);
     setvalorOtraInstitucion(event.target.value);
   }
 
@@ -50,25 +52,97 @@ function FormularioNuevaActividad() {
     setValorEnlaceVerificacion(event.target.value);
   }
 
+  function handleChange5(event) {
+    setvalorSelectUniversidad(event.target.value);
+    setvalorSelectFacultad(event.target.value);
+    setvalorSelectCarrera(event.target.value);
+  }
+  let idActividad = valorActividades;
+  localStorage.setItem("idActividad", idActividad);
+
+  useEffect(() => {
+    const peticion = async () => {
+      let idActividad = localStorage.getItem("idActividad");
+      let idFacultad = localStorage.getItem("idFacultad");
+      try {
+        const response = await fetch(`${variableFacultad}/1`, {
+          method: "GET",
+          mode: "cors",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data1 = await response.json();
+        setDataFacultades(data1);
+
+        const response3 = await fetch(`${variableCarrera}/${idFacultad}`, {
+          method: "GET",
+          mode: "cors",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data3 = await response3.json();
+        setData(data3);
+        setselectedOption(data3[0].value);
+
+        const response2 = await fetch(`${variableSubTipo}/${idActividad}`, {
+          method: "GET",
+          mode: "cors",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data2 = await response2.json();
+
+        setSubActividades(data2);
+
+        const response7 = await fetch(`${variableTipoActividad}`, {
+          method: "GET",
+          mode: "cors",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data7 = await response7.json();
+        setTipoActividad(data7);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    peticion();
+    const intervalId = setInterval(peticion, 1000);
+    return () => clearInterval(intervalId);
+  }, []);
+
   let idFacultad = valorSelectFacultad;
-    localStorage.setItem("idFacultad", idFacultad);
+  localStorage.setItem("idFacultad", idFacultad);
+
+  const datoSeleccionado = valorSelectModal;
+  localStorage.setItem("datoSeleccionado", datoSeleccionado);
+
+  const idCarreraSeleccionada = valorSelectCarrera;
+  localStorage.setItem("idCarrera", idCarreraSeleccionada);
+
+  const detalleDocente = valorDetalleActividadDocente;
+  localStorage.setItem("detalleDocente", detalleDocente);
+
+  const nombreOtraInstitucion = valorOtraInstitucion;
+  localStorage.setItem("nombreOtraInstitucion", nombreOtraInstitucion);
+  
+  const enlaceVerificacionLocal = valorEnlaceVerificacion;
+  localStorage.setItem("enlaceVerificacion", enlaceVerificacionLocal);
 
 
-    const datoSeleccionado = valorSelectModal;
-    localStorage.setItem("datoSeleccionado", datoSeleccionado);
-
-    const idCarreraSeleccionada = valorSelectCarrera;
-    localStorage.setItem("idCarrera", idCarreraSeleccionada);
-
-    const nombreOtraInstitucion = valorOtraInstitucion;
-    localStorage.setItem("nombreOtraInstitucion", nombreOtraInstitucion);
-
-    const detalleDocente = valorDetalleActividadDocente;
-    localStorage.setItem("detalleDocente", detalleDocente);
-    
+  const idTipoActividad = valorSelectModal;
 
   function cambiarModal() {
     const valueSelect = document.getElementById("select").value;
+    setValorActividades(valueSelect);
     const select = document.getElementById("select");
     if (valueSelect == "1") {
       select.setAttribute("onChange", cambiarEstadoModal1(!estadoModal1));
@@ -95,21 +169,18 @@ function FormularioNuevaActividad() {
         "onChange",
         cambiarEstadoModal5(!estadoModal5)
       );
-      localStorage.setItem("idUniversidad", 1);
+      localStorage.setItem("universidad", "Universidad Central del Ecuador")
     }
-    if (valueSelectInstitucion == "1") {
+    if (valueSelectInstitucion === "1") {
       selectInstitucion.setAttribute(
         "onChange",
         cambiarEstadoModal6(!estadoModal6)
       );
-      const nombreOtraInstitucion = valorOtraInstitucion;
-      localStorage.setItem("nombreOtraInstitucion", nombreOtraInstitucion);
     }
   }
-
   return (
     <div>
-      <Navigation/>
+      <Navigation />
       <div className="container py-3  text-center ">
         <div className="card-header py-3">
           <h3>Ingreso de datos de la Actividad</h3>
@@ -128,72 +199,76 @@ function FormularioNuevaActividad() {
                   id="select"
                   className="form-control"
                   required={true}
-                  name="idTipoActividad"
+                  name="idActivityType"
                 >
                   <option className="text-center">*** Seleccione ***</option>
-                  <option value="1">One</option>
-                  <option value="2">Two</option>
-                  <option value="3">Three</option>
-                  <option value="4">Fourth</option>
+                  {tipoActividad.map((object) => (
+                    <option
+                      key={object.idActivityType}
+                      value={object.idActivityType}
+                    >
+                      {object.nameActivityType}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
 
             <div className="form-group  d-flex flex-column justify-content-center align-items-center py-2">
-              <label className="p-2 col-form-label" htmlFor="fechaInicio">
+              <label className="p-2 col-form-label" htmlFor="starDate">
                 Fecha de Inicio
               </label>
               <div className="p-2 col-sm-3">
                 <input
                   type="date"
                   required={true}
-                  id="fechaInicio"
-                  name="fechaInicio"
+                  id="starDate"
+                  name="starDate"
                   className="form-control"
                 />
               </div>
             </div>
 
             <div className="form-group  d-flex flex-column justify-content-center align-items-center py-2">
-              <label className="p-2 col-form-label" htmlFor="fechaFin">
+              <label className="p-2 col-form-label" htmlFor="endDate">
                 Fecha de Finalización
               </label>
               <div className="p-2 col-sm-3">
                 <input
                   type="date"
                   required={true}
-                  id="fechaFin"
-                  name="fechaFin"
+                  id="endDate"
+                  name="endDate"
                   className="form-control"
                 />
               </div>
             </div>
 
             <div className="form-group  d-flex flex-column justify-content-center align-items-center py-2">
-              <label className="p-2 col-form-label" htmlFor="descripcion">
+              <label className="p-2 col-form-label" htmlFor="descriptionActivity">
                 Detalle
               </label>
               <div className="p-2 col-sm-3">
                 <input
                   type="text"
                   required={true}
-                  id="descripcion"
-                  name="descripcion"
+                  id="descriptionActivity"
+                  name="descriptionActivity"
                   className="form-control"
                 />
               </div>
             </div>
 
             <div className="form-group  d-flex flex-column justify-content-center align-items-center py-2">
-              <label className="p-2 col-form-label" htmlFor="evidencias">
+              <label className="p-2 col-form-label" htmlFor="evidences">
                 Enlace de la evidencia
               </label>
               <div className="p-2 col-sm-3">
                 <input
                   type="url"
                   required={true}
-                  id="evidencias"
-                  name="evidencias"
+                  id="evidences"
+                  name="evidences"
                   className="form-control"
                 />
               </div>
@@ -210,7 +285,7 @@ function FormularioNuevaActividad() {
                   onChange={() => {
                     cambiarModalInstitucion();
                   }}
-                  name="tipoInstitucion"
+                  
                   className="form-control"
                 >
                   <option className="text-center"> ** Seleccione **</option>
@@ -252,9 +327,12 @@ function FormularioNuevaActividad() {
                         {" "}
                         ** Seleccione **{" "}
                       </option>
-                      {actividadID.map((object) => (
-                        <option key={object.id} value={object.id}>
-                          {object.tipoActEstructura}
+                      {subActividades.map((object) => (
+                        <option
+                          key={object.idActivitySubtype}
+                          value={object.idActivitySubtype}
+                        >
+                          {object.nameActivitySubtype}
                         </option>
                       ))}
                     </select>
@@ -296,9 +374,12 @@ function FormularioNuevaActividad() {
                       className="form-control"
                     >
                       <option> ** Seleccione ** </option>
-                      {actividadInvestigadora.map((object) => (
-                        <option key={object.id} value={object.id}>
-                          {object.tipoActInvestigadora}
+                      {subActividades.map((object) => (
+                        <option
+                          key={object.idActivitySubtype}
+                          value={object.idActivitySubtype}
+                        >
+                          {object.nameActivitySubtype}
                         </option>
                       ))}
                     </select>
@@ -340,9 +421,12 @@ function FormularioNuevaActividad() {
                       className="form-control"
                     >
                       <option> ** Seleccione ** </option>
-                      {actividadDocente.map((object) => (
-                        <option key={object.id} value={object.id}>
-                          {object.tipoActDocente}
+                      {subActividades.map((object) => (
+                        <option
+                          key={object.idActivitySubtype}
+                          value={object.idActivitySubtype}
+                        >
+                          {object.nameActivitySubtype}
                         </option>
                       ))}
                     </select>
@@ -402,9 +486,12 @@ function FormularioNuevaActividad() {
                       cursor="pointer"
                     >
                       <option> ** Seleccione ** </option>
-                      {actividadInnovacion.map((object) => (
-                        <option key={object.id} value={object.id}>
-                          {object.tipoActInnovacion}
+                      {subActividades.map((object) => (
+                        <option
+                          key={object.idActivitySubtype}
+                          value={object.idActivitySubtype}
+                        >
+                          {object.nameActivitySubtype}
                         </option>
                       ))}
                     </select>
@@ -442,7 +529,7 @@ function FormularioNuevaActividad() {
                     <select
                       id="select-universidad"
                       value={valorSelectUniversidad}
-                      onChange={handleChange}
+                      onChange={handleChange5}
                       className="form-control"
                     >
                       <option disabled> ** Seleccione ** </option>
@@ -468,8 +555,11 @@ function FormularioNuevaActividad() {
                         >
                           <option> ** Seleccione ** </option>
                           {dataFacultades.map((object) => (
-                            <option key={object.id} value={object.id}>
-                              {object.nombreFacultad}
+                            <option
+                              key={object.idFaculty}
+                              value={object.idFaculty}
+                            >
+                              {object.facultyName}
                             </option>
                           ))}
                         </select>
@@ -491,8 +581,11 @@ function FormularioNuevaActividad() {
                             >
                               <option> ** Seleccione ** </option>
                               {data.map((object) => (
-                                <option key={object.id} value={object.id}>
-                                  {object.nombreCarrera}
+                                <option
+                                  key={object.idCareer}
+                                  value={object.idCareer}
+                                >
+                                  {object.careerName}
                                 </option>
                               ))}
                             </select>
