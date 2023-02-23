@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import Navigation from "./Navigation";
+import Alert from "react-bootstrap/Alert";
+const periodo = localStorage.getItem("periodo");
 
 const token = sessionStorage.getItem("token");
 const variableTipoActividad = process.env.REACT_APP_API_GENERAL + "/type";
@@ -133,10 +135,9 @@ function FormularioNuevaActividad({}) {
 
   const nombreOtraInstitucion = valorOtraInstitucion;
   localStorage.setItem("nombreOtraInstitucion", nombreOtraInstitucion);
-  
+
   const enlaceVerificacionLocal = valorEnlaceVerificacion;
   localStorage.setItem("enlaceVerificacion", enlaceVerificacionLocal);
-
 
   const idTipoActividad = valorSelectModal;
 
@@ -169,7 +170,7 @@ function FormularioNuevaActividad({}) {
         "onChange",
         cambiarEstadoModal5(!estadoModal5)
       );
-      localStorage.setItem("universidad", "Universidad Central del Ecuador")
+      localStorage.setItem("universidad", "Universidad Central del Ecuador");
     }
     if (valueSelectInstitucion === "1") {
       selectInstitucion.setAttribute(
@@ -182,9 +183,15 @@ function FormularioNuevaActividad({}) {
     <div>
       <Navigation />
       <div className="container py-3  text-center ">
-        <div className="card-header py-3">
+      <div className="d-flex flex-column justify-content-center align-items-center py-5 ">
+          <Alert variant="primary" className=" col-sm-5 text-center">
+            Usted se encuentra en el periodo: <h3>{periodo}</h3>
+          </Alert>
+        </div>
+        <div className="card-header">
           <h3>Ingreso de datos de la Actividad</h3>
         </div>
+        
         <div className="card-body">
           <div>
             <div className="form-group  d-flex flex-column justify-content-center align-items-center py-2">
@@ -245,7 +252,10 @@ function FormularioNuevaActividad({}) {
             </div>
 
             <div className="form-group  d-flex flex-column justify-content-center align-items-center py-2">
-              <label className="p-2 col-form-label" htmlFor="descriptionActivity">
+              <label
+                className="p-2 col-form-label"
+                htmlFor="descriptionActivity"
+              >
                 Detalle
               </label>
               <div className="p-2 col-sm-3">
@@ -285,7 +295,6 @@ function FormularioNuevaActividad({}) {
                   onChange={() => {
                     cambiarModalInstitucion();
                   }}
-                  
                   className="form-control"
                 >
                   <option className="text-center"> ** Seleccione **</option>

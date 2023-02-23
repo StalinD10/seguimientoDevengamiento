@@ -10,10 +10,19 @@ import Swal from "sweetalert2";
 const token = sessionStorage.getItem("token");
 const variableFiniquito =   process.env.REACT_APP_API_GENERAL +"/accrualData/settlement";
 const idPersona = sessionStorage.getItem("idPersona")
+
+
 function Navigation() {
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+
+function cerrar(){
+  sessionStorage.clear();
+  localStorage.clear();
+  window.location.href = "/"
+}
+  
 
   async function handleSubmit() {
     try {
@@ -110,7 +119,7 @@ function Navigation() {
                 <NavDropdown.Item href="/nuevaActividad">Ingresar</NavDropdown.Item>
                 <NavDropdown.Item href="mostrarActividades">Ver</NavDropdown.Item>
               </NavDropdown>
-              <Nav.Link href="/">Cerrar Sesión</Nav.Link>
+              <Nav.Link onClick={cerrar}>Cerrar Sesión</Nav.Link>
             </Nav>
           </Navbar.Collapse>
         </Container>

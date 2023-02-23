@@ -9,7 +9,7 @@ function layout() {
             <div className="mask">
               <div className="d-flex justify-content-end align-items-center ">
                 <div className="text-white">
-                  <h3 className="mb-3">UNIVERSIDAD CENTRAL DEL ECUADOR </h3>
+                  <h3 className="mb-3 text-white">UNIVERSIDAD CENTRAL DEL ECUADOR </h3>
                   <h4 className="mb-3">Sistema de seguimiento a Devengamiento</h4>
 
                 </div>

@@ -7,12 +7,14 @@ import Form from 'react-bootstrap/Form';
 import Navigation from "./Navigation";
 
 const token = sessionStorage.getItem("token");
+const idPlan = sessionStorage.getItem("idPlan");
 const variableTipoActividad = process.env.REACT_APP_API_GENERAL + "/type";
 const variableFacultad =
   process.env.REACT_APP_API_GENERAL + "/faculty/byIdUniversity";
 const variableCarrera =
   process.env.REACT_APP_API_GENERAL + "/career/byIdFaculty";
 const variableSubTipo = process.env.REACT_APP_API_GENERAL + "/subtype/byIdType";
+const variableObtenerActividades = process.env.REACT_APP_API_GENERAL+"/activityPlan/byPlan"
 
 
 function MostrarActividades({}) {
@@ -173,12 +175,49 @@ function MostrarActividades({}) {
       localStorage.setItem("nombreOtraInstitucion", nombreOtraInstitucion);
     }
   }
+
+  // Consultas para datos de la actividad de devengamiento
+
+  const useLoaderData1 = () => {
+    const [dataActividad, setDataActividad] = useState({});
+    const loader2 = async () => {
+      try {
+        const response2 = await fetch(`${variableObtenerActividades}/${idPlan}`, {
+          method: "GET",
+          mode: "cors",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+  
+        const dataActividades = await response2.json();
+       
+        setDataActividad( dataActividades);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    useEffect(() => {
+      loader2();
+    }, []);
+    return dataActividad;
+  };
+  
+  
+
+const datosActividadPlan = useLoaderData1();
+
+// Obtener datos del editar actividad
+
+
   return (
     <div>
       <Navigation />
       <div className="p-3 m-3">
 
         <h3 className="p-2">Actividades del periodo 2022-2023</h3>
+        {datosActividadPlan.length ? (
         <Table striped>
           <thead>
             <tr>
@@ -190,23 +229,50 @@ function MostrarActividades({}) {
               <th>Enlaces de evidencia</th>
               <th>Lugar de la actividad</th>
               
-              <th>Estado</th>
+              <th></th>
             </tr>
           </thead>
+        
           <tbody>
-            <tr>
-              <td>1</td>
-              <td>estrucuras</td>
-              <td>14/12/2015</td>
-              <td>12/10/2022</td>
-              <td>esta actividad
-                sdsdsdsdsdd/.....</td>
-              <td>http//.......</td>
-              <td>universidad central</td>
-              <td>economia</td>
-            
+            {datosActividadPlan.map((actividades, index) => (
+                <tr key={index}>
+                  <td>
+                    {actividades.activity.idActivity === null
+                      ? "No disponible"
+                      : actividades.activity.idActivity}
+                  </td>
+                  <td>
+                    {actividades.type.nameActivityType === null
+                      ? "No disponible"
+                      : actividades.type.nameActivityType
+                    }
+                  </td>
+                  <td>
+                    {actividades.activity.startDate=== null
+                      ? "No disponible"
+                      : actividades.activity.startDate}
+                  </td>
+                  <td>
+                    {actividades.activity.endDate === null
+                      ? "No disponible"
+                      : actividades.activity.endDate}
+                  </td>
+                  <td>
+                    {actividades.activity.description === null
+                      ? "No disponible"
+                      : actividades.activity.description
+                    }
+                  </td>
+
+                  <td>
+                    {actividades.activity.evidences === null
+                      ? "No disponible"
+                      : actividades.activity.evidences
+                    }
+                  </td>
+
               <div >
-                <Button variant="primary" onClick={handleShowEditar}>Editar</Button>{" "}
+                <Button disabled variant="primary" onClick={handleShowEditar}>Editar</Button>
                 <Modal
                   show={showEditar}
                   onHide={handleCloseEditar}
@@ -701,10 +767,14 @@ function MostrarActividades({}) {
                 </Modal>
               </div>
             </tr>
+          ))}
           </tbody>
-
+      
 
         </Table>
+          ) : (
+            <p>No existen datos del docente disponibles</p>
+          )}
         <div>
           <Button variant="primary" onClick={handleShow}>Enviar </Button>{" "}
           <Modal show={show}

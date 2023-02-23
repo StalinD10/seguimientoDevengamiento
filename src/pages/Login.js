@@ -25,7 +25,7 @@ export async function action({ request }) {
      
       const valorToken = token.token;
       sessionStorage.setItem("token", valorToken);
-      const periodo = "2023 - 2024"
+      const periodo = "2022 - 2023"
       localStorage.setItem("periodo", periodo);
       const partesToken = valorToken.split(".");
       const decoded = atob(partesToken[1]);
