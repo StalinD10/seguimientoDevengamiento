@@ -5,11 +5,63 @@ import NavDropdown from "react-bootstrap/NavDropdown";
 import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
+import Swal from "sweetalert2";
 
+const token = sessionStorage.getItem("token");
+const variableFiniquito =   process.env.REACT_APP_API_GENERAL +"/accrualData/settlement";
+const idPersona = sessionStorage.getItem("idPersona")
 function Navigation() {
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+
+  async function handleSubmit() {
+    try {
+      const respuesta = await fetch(
+        `${variableFiniquito}/${idPersona}`,
+        {
+          method: "PATCH",
+          mode: "cors",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(
+            "true"),
+        }
+      );
+      await respuesta.json();
+      if (respuesta.ok) {
+      
+        await Swal.fire({
+          title: "Enviado",
+          text: "La solicitud ha sido enviada correctamente",
+          icon: "success",
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "OK",
+        });
+        handleClose();
+      } else {
+        await Swal.fire({
+          title: "Error",
+          text: "Ocurrió un error al enviar la solicitud",
+          icon: "error",
+          confirmButtonColor: "#3085d6",
+          confirmButtonText: "OK",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      await Swal.fire({
+        title: "Error",
+        text: "Ocurrió un error al enviar la solicitud",
+        icon: "error",
+        confirmButtonColor: "#3085d6",
+        confirmButtonText: "OK",
+      });
+    }
+  }
   return (
     <div>
       <Navbar bg="light" expand="lg">
@@ -48,15 +100,15 @@ function Navigation() {
                 </Modal.Body>
                 <Modal.Footer>
                   <Button variant="secondary" onClick={handleClose}>Cancelar</Button>
-                  <Button variant="primary">Enviar Solicitud</Button>
+                  <Button variant="primary" onClick={handleSubmit}>Enviar Solicitud</Button>
                 </Modal.Footer>
               </Modal>
               <NavDropdown
                 title="Actividad Devengamiento"
                 id="basic-nav-dropdown"
               >
-                <NavDropdown.Item href="#action/3.1">Ingresar</NavDropdown.Item>
-                <NavDropdown.Item href="#action/3.2">Ver</NavDropdown.Item>
+                <NavDropdown.Item href="/nuevaActividad">Ingresar</NavDropdown.Item>
+                <NavDropdown.Item href="mostrarActividades">Ver</NavDropdown.Item>
               </NavDropdown>
               <Nav.Link href="/">Cerrar Sesión</Nav.Link>
             </Nav>

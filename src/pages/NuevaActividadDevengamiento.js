@@ -98,9 +98,9 @@ function NuevaActividadDevengamiento() {
           errores.map((error, i) => <Error key={i}>{error} </Error>)}
         <div className="text-center py-3">
           <input
-            className="btn btn-secondary my-2 "
+            className="btn btn-primary my-2 "
             type="submit"
-            value="Ingresar"
+            value="Registrar"
           />
         </div>
       </Form>
